@@ -2,12 +2,15 @@
 import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { useUser } from "@/lib/user-context";
 
 export default function DefaultLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const {user} = useUser();
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>

@@ -1,5 +1,4 @@
 import { Role } from "@/lib/authorization";
-import { hashPassword } from "@/lib/password";
 import { createUser, getUser } from "@/lib/user";
 
 const args = require('minimist')(process.argv.slice(2));

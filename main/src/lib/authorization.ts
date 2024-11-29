@@ -1,35 +1,66 @@
+import { Modules } from "./menu";
 
 export enum Role {
-    STAFF = 0,
-    SUPERADMIN = 1,
+    USER = 0,
+    STAFF = 100,
+    SUPERADMIN = 200,
 }
 export namespace Role{
    export function isAdmin(role:Role): boolean{
         return role === Role.SUPERADMIN
     }
+    export function getUserRoleName(role:Role){
+        switch (role) {
+          case Role.USER:
+            return "User";
+          case Role.STAFF:
+            return "Staff";
+          case Role.SUPERADMIN:
+            return "Super Admin"
+          default:
+            const _exhaustiveCheck: never = role;
+            throw new Error("CRASH AND BURN")
+        }
+      }
 }
 
-type Action = "read" | "create" | "update" | "destroy" | "all";
 
-type Module = "services" | "porfolio";
+
+type Action = "read" | "create" | "update" | "destroy" ;
+
+const allActions: Action[] = ["read","create","destroy","update"]
+
 
 type ModulePermissions = Partial<Record<Role,Action[]>>;
+const default_permissions: ModulePermissions = {
+    [Role.SUPERADMIN]: allActions,
+    [Role.STAFF]: ["read", 'create','update'],
+    [Role.USER]: ['read']
+}
 
-const MODULE_PERMISSION: Record<Module,ModulePermissions> = {
+const MODULE_PERMISSION: Record<Modules,ModulePermissions> = {
     services:{
-        [Role.SUPERADMIN]:['all'],
-        [Role.STAFF]:['read','create','update']
+        ...default_permissions,
     },
-    porfolio:{
-
+    secret:{
+        [Role.SUPERADMIN]: allActions,
+    },
+    profile:{
+        [Role.STAFF]:allActions,
+        [Role.SUPERADMIN]:allActions,
+        [Role.USER]: allActions,
+    },
+    basicdetails:{
+        ...default_permissions,
+    },
+    dashboard:{
+        ...default_permissions,
     }
 }
 
-function hasAccess(module:Module, action: Action, role: Role): boolean{
+export function hasActionAccess(module:Modules, action: Action, role: Role): boolean{
     const modulePermissions = MODULE_PERMISSION[module];
-
     return Role.isAdmin(role) ? true: modulePermissions[role]?.includes(action) || false
 }
 
 
-export {hasAccess};

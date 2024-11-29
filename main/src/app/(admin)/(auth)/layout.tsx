@@ -16,12 +16,9 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true}>
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+          <>
           {children}
-        </div>
-      </body>
-    </html>
+          </>
+
   );
 }

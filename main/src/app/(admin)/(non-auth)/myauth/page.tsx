@@ -14,7 +14,7 @@ export default async function Page(){
             </DefaultLayout>
         </div>
     }else{
-        return <form action={login}>
+        return <form>
             <button type="submit">login</button>
         </form>
     }

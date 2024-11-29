@@ -49,7 +49,9 @@ export function LoginForm(){
                       </div>
       
                       <div className="mb-5 w-full">
-                        <Button className={"w-full"} type="submit">
+                        <Button className={"w-full"} type="submit"
+                          isDisabled={isPending}
+                        >
                           Sign In
                         </Button>
                       </div>

@@ -1,11 +1,14 @@
 "use server";
 import { getIronSession, SessionOptions } from "iron-session";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { Role } from "./authorization";
 import { verifyPasswordHash } from "./password";
 import { getUser } from "./user";
 
 export type SessionData = {
+  id: number;
   username: string;
   isLoggedIn: boolean;
   role: Role;
@@ -14,7 +17,8 @@ export type SessionData = {
 const defaultSession: SessionData = {
   username: "",
   isLoggedIn: false,
-  role: 3,
+  role: 0,
+  id:0,
 };
 
 const sessionOptions: SessionOptions = {
@@ -47,9 +51,12 @@ export async function login(prevState: any, formdata: FormData) {
   session.isLoggedIn = true;
   session.role = user.role;
   await session.save();
+  revalidatePath("/");
+  return redirect('/');
 }
 
 export async function logout() {
   const session = await getSession();
   session.destroy();
+  return redirect("/login")
 }

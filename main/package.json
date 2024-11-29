@@ -18,6 +18,7 @@
     "iron-session": "^8.0.4",
     "jsvectormap": "^1.6.0",
     "kysely": "^0.27.4",
+    "lucide-react": "^0.462.0",
     "minimist": "^1.2.8",
     "mysql2": "^3.11.4",
     "next": "15.0.3",

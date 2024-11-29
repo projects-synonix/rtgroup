@@ -13,20 +13,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  // const [sidebarOpen, setSidebarOpen] = useState(false);
+  // const [loading, setLoading] = useState<boolean>(true);
 
-  // const pathname = usePathname();
+  // // const pathname = usePathname();
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => setLoading(false), 1000);
+  // }, []);
 
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          {loading ? <Loader /> : <DefaultLayout>{children}</DefaultLayout>}
+          {children}
         </div>
       </body>
     </html>
