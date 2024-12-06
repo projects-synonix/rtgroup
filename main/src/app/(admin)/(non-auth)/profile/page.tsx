@@ -1,18 +1,27 @@
+"use server"
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import Image from "next/image";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
 import { CircleUser } from "lucide-react";
-export const metadata: Metadata = {
-  title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",
-  description:
-    "This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { Role } from "@/lib/authorization";
+import { Disclosure, DisclosureHeader, DisclosurePanel } from "@/components/react-aria/Disclosure";
+import { ChangePassDisclosure } from "./components";
 
-const Profile = () => {
+
+export default async function Page(){
+  const session = await getSession();
+  if(!session.isLoggedIn){
+    return redirect("/login");
+  }
+  if(!Role.hasActionAccess('profile','read',session.role)){
+    return redirect("/");
+  }
   return (
-    <div className="mx-auto max-w-242.5">
+    <div className="mx-auto max-w-242.5 min-h-screen">
       <Breadcrumb pageName="Profile" />
 
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -33,15 +42,17 @@ const Profile = () => {
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              Danish Heilium
+            <h3 className="mb-1.5 text-2xl font-semibold capitalize text-black dark:text-white">
+              {session.username}
             </h3>
-            <p className="font-medium">Ui/Ux Designer</p>
+            <p className="font-medium capitalize">{Role.getUserRoleName(session.role)}</p>
           </div>
         </div>
+        <ChangePassDisclosure/>
       </div>
     </div>
   );
 };
 
-export default Profile;
+
+

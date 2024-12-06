@@ -12,7 +12,11 @@ import { getSession } from "@/lib/session";
 import { Role } from "@/lib/authorization";
 import { ClientComponent } from "./comp";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Admin Panel",
+};
 
 export default async function RootLayout({
   children,

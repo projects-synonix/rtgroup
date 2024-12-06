@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,10 +8,13 @@ import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { NotebookTabs, LayoutDashboard,CircleUser } from "lucide-react";
+import { menuConfig } from "@/lib/menu";
+import { Role } from "@/lib/authorization";
 
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
+  userRole: Role;
 }
 
 const menuGroups = [
@@ -43,10 +46,13 @@ const menuGroups = [
 
 ];
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, userRole }: SidebarProps) => {
+  // console.log(userRole,'+++++')
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-
+  const list = useMemo(()=>Object.values(menuConfig).filter((menuItem,menuIndex)=>{
+    return userRole >= menuItem.minRole
+  }),[userRole]);
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
@@ -92,14 +98,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
           {/* <!-- Sidebar Menu --> */}
           <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
-            {menuGroups.map((group, groupIndex) => (
+            {/* {menuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
                   {group.name}
-                </h3>
+                </h3> */}
 
                 <ul className="mb-6 flex flex-col gap-1.5">
-                  {group.menuItems.map((menuItem, menuIndex) => (
+                  {list.map((menuItem, menuIndex) => (
                     <SidebarItem
                       key={menuIndex}
                       item={menuItem}
@@ -108,8 +114,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     />
                   ))}
                 </ul>
-              </div>
-            ))}
+              {/* </div>
+            ))} */}
           </nav>
           {/* <!-- Sidebar Menu --> */}
         </div>

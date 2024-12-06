@@ -1,8 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
 import { Button } from "./Button";
 import { CropperComponent } from "./Cropper";
+import { uploadFile } from "@/lib/fileupload";
 
 const thumbsContainer: React.CSSProperties = {
   display: "flex",
@@ -36,9 +37,9 @@ const img: React.CSSProperties = {
   height: "auto",
 };
 
-type FileWithPreview = File & { preview?: string };
+export type FileWithPreview = File & { preview?: string };
 
-export function DropFiles() {
+export function ImageUpload() {
   const [file, setFile] = useState<FileWithPreview | null>(null);
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -56,7 +57,7 @@ export function DropFiles() {
     onDragOver: () => {},
     onDragLeave: () => {},
   } as DropzoneOptions);
-  console.log(file, typeof file);
+  console.log(file, file?.name);
   const thumbs =
     file === null ? (
       <></>
@@ -70,8 +71,8 @@ export function DropFiles() {
               URL.revokeObjectURL(file.preview!);
             }}
           />
-          <Button variant="icon" onPress={() => setFile(null)}>
-            X
+          <Button variant="icon" className={" font-bold text-red"} onPress={() => setFile(null)}>
+            Remove
           </Button>
         </div>
       </div>
@@ -82,24 +83,28 @@ export function DropFiles() {
     return () => URL.revokeObjectURL(file?.preview!);
   }, [file]);
 
+  const [errorMsg, formAction, isPending] = useActionState(uploadFile,null);
+  const onSubmit = async (formData:FormData) => {
+    formData.append('file', file!);
+    console.log(formData,'-----=======');
+    let res = await formAction(formData);
+    console.log(res);
+  }
   return (
     <>
-      <section className="container h-auto rounded-md border-2 border-gray-400 bg-gray-100 p-2 shadow-1 shadow-gray-300 drop-shadow-xl dark:bg-gray-800">
+      <section className="w-full h-auto rounded-md border-2 border-gray-400  p-2 shadow-1 shadow-gray-300 drop-shadow-xl bg-gray-100 dark:bg-gray-800">
         <div {...getRootProps({ className: "dropzone w-full h-32" })}>
           <input {...getInputProps({})} className="w-full bg-red-100" />
           <p className="h-32 bg-gray-300 text-center dark:bg-gray-600">
-            Drag 'n' drop some files here, or click to select files
+            Drag n drop some files here, or click to select files
           </p>
         </div>
         <div style={thumbsContainer}>{thumbs}</div>
       </section>
       {file && <>
-        <CropperComponent file={file}/>
+        <CropperComponent file={file} setFile={setFile} formAction={onSubmit}/>
       </>}
     </>
   );
 }
 
-{
-  /* <DropFiles />; */
-}

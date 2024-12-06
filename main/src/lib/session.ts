@@ -57,6 +57,7 @@ export async function login(prevState: any, formdata: FormData) {
 
 export async function logout() {
   const session = await getSession();
+  console.log(session.id,'\\\\\\\\\\\\\\')
   session.destroy();
   return redirect("/login")
 }
