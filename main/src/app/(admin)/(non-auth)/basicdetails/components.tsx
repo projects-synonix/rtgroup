@@ -1,8 +1,6 @@
 "use client";
-import { Label } from "@/components/react-aria/Field";
 import { TextField, TextFieldArea } from "@/components/react-aria/TextField";
 import { BasicDetails } from "@/types/kysely";
-import { TextArea } from "react-aria-components";
 
 export function BasicDetailComponent({ details }: { details: BasicDetails }) {
     
