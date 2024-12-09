@@ -9,7 +9,7 @@ export default async function Page() {
   return (
     <>
       <Breadcrumb pageName="Basic Details & Contact Information" />
-      <BasicDetailComponent/>
+      <BasicDetailComponent details={details!}/>
     </>
   );
 }
