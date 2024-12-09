@@ -36,14 +36,14 @@ export namespace Role {
   }
 }
 
-type Action = "read" | "create" | "update" | "destroy";
+type Action = "read" | "create" | "edit" | "destroy";
 
-const allActions: Action[] = ["read", "create", "destroy", "update"];
+const allActions: Action[] = ["read", "create", "destroy", "edit"];
 
 type ModulePermissions = Partial<Record<Role, Action[]>>;
 const default_permissions: ModulePermissions = {
   [Role.SUPERADMIN]: allActions,
-  [Role.STAFF]: ["read", "create", "update"],
+  [Role.STAFF]: ["read", "create", "edit"],
   [Role.USER]: ["read"],
 };
 
@@ -67,4 +67,26 @@ const MODULE_PERMISSION: Record<Module, ModulePermissions> = {
   },
 };
 
-// 
+export function ProtectedComponent({
+  children,
+  module,
+  action,
+  role,
+  fallback,
+}: {
+  children: React.ReactNode;
+  module: Module;
+  action: Action;
+  role: Role;
+  fallback: boolean;
+}) {
+  if (Role.hasActionAccess(module, action, role)) {
+    return { children };
+  } else {
+    if (fallback) {
+      return <>You don't have enough permission</>;
+    } else {
+      return <></>;
+    }
+  }
+}

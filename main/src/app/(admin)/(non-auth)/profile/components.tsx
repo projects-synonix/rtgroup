@@ -51,6 +51,10 @@ function ChangePassForm() {
             {formState.message}
           </p>
         )}
+        {formState.success && 
+        <p className="text-sm text-green-600 forced-colors:text-[Mark]">
+        {formState.message}
+      </p>}
       </Form>
     </>
   );

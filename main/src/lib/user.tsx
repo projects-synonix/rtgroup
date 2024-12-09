@@ -38,7 +38,6 @@ export async function getUser(input: number | string) {
       .select(["id", "user.username", "role", "password", "random_no"])
       .where(typeof input === "number" ? "id" : "username", "=", input)
       .executeTakeFirst();
-    console.log(result, "res");
     return result;
   } catch (error) {
     throwDBError(error as QueryError);
@@ -54,7 +53,8 @@ const ChangePassSchema = z.object({
 export type ChangePassResult = { success: boolean; message: string };
 
 export async function changePassword(
-  formData: FormData,id:number
+  formData: FormData,
+  id: number,
 ): Promise<ChangePassResult> {
   const oldPass = formData.get("oldpassword") as string;
   const newPass1 = formData.get("newpassword") as string;
@@ -64,14 +64,11 @@ export async function changePassword(
     return { success: false, message: "Passwords doesn't match." };
   }
   const user = await getUser(id);
-  console.log(user?.password);
-  if (!await verifyPasswordHash(user?.password!, oldPass)) {
-    console.log('aaaaaaaaaaaaaaaaa')
+  if (!(await verifyPasswordHash(user?.password!, oldPass))) {
     return { success: false, message: "Incorrect old password." };
   }
   const hashpass = await hashPassword(newPass1);
   try {
-    
     const res = await db
       .updateTable("user")
       .set({ password: hashpass })

@@ -50,6 +50,7 @@ export async function login(prevState: any, formdata: FormData) {
   session.username = user.username;
   session.isLoggedIn = true;
   session.role = user.role;
+  session.id= user.id;
   await session.save();
   revalidatePath("/");
   return redirect('/');

@@ -11,6 +11,7 @@ export interface Database {
   person: PersonTable;
   pet: PetTable;
   user: UserTable;
+  basic_details: BasicDetailsTable;
 }
 
 
@@ -82,7 +83,20 @@ export interface UserTable {
   username: string;
 }
 
+
 export type User = Selectable<UserTable>;
 export type NewUser = Insertable<UserTable>;
 export type UserUpdate = Updateable<UserTable>;
 
+
+export interface BasicDetailsTable {
+  about_us: string | null;
+  company_name: string | null;
+  created_at: Generated<Date>;
+  id: Generated<number>;
+  logo_url: string | null;
+}
+
+export type BasicDetails = Selectable<BasicDetailsTable>;
+export type NewBasicDetails = Insertable<BasicDetailsTable>;
+export type UpdateBasicDetails = Updateable<BasicDetailsTable>;
