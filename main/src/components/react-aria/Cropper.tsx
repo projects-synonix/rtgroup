@@ -8,11 +8,13 @@ import { Button } from "./Button";
 const CropperComponent = ({
   file,
   setFile,
-  formAction,
+  // formAction,
+  inputRef
 }: {
   file: File;
   setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
-  formAction: (payload: FormData) => void
+  inputRef:  React.RefObject<HTMLInputElement | null>;
+  // formAction: (payload: FormData) => void
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -86,6 +88,14 @@ const CropperComponent = ({
         );
         setZoom(1);
         setCrop({ x: 0, y: 0 });
+        console.log(inputRef.current,']]]]]]]]]]]]')
+        if(inputRef.current){
+          let dataTransfer = new DataTransfer();
+          dataTransfer.items.add(croppedImageFile);
+          console.log(dataTransfer.items,dataTransfer.files)
+          inputRef.current.files = dataTransfer.files;
+          console.log(inputRef.current.files,'aaaaaaaaaaaaaaa')
+        }
       }
     } catch (error) {
       console.error("Error cropping image:", error);
@@ -110,9 +120,9 @@ const CropperComponent = ({
       </div>
       <div className="float-right flex gap-2">
         <Button onPress={cropper}>Crop</Button>
-        <form action={formAction}>
+        {/* <form action={formAction}>
         <Button variant="success" type="submit">Save</Button>
-        </form>
+        </form> */}
       </div>
     </>
   );

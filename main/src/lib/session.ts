@@ -35,6 +35,7 @@ export async function getSession() {
 }
 
 export async function login(prevState: any, formdata: FormData) {
+  let cookie = cookies();
   const username = formdata.get("username") as string;
   const password = formdata.get("password") as string;
   console.log(typeof username, password);
@@ -62,3 +63,4 @@ export async function logout() {
   session.destroy();
   return redirect("/login")
 }
+

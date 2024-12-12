@@ -14,7 +14,6 @@ export interface Database {
   basic_details: BasicDetailsTable;
 }
 
-
 // This interface describes the `person` table to Kysely. Table
 // interfaces should only be used in the `Database` type above
 // and never as a result type of a query!. See the `Person`,
@@ -83,15 +82,13 @@ export interface UserTable {
   username: string;
 }
 
-
 export type User = Selectable<UserTable>;
 export type NewUser = Insertable<UserTable>;
 export type UserUpdate = Updateable<UserTable>;
 
-
 export interface BasicDetailsTable {
-  about_us: string | null;
-  company_name: string | null;
+  about_us: Generated<string>;
+  company_name: Generated<string>;
   created_at: Generated<Date>;
   id: Generated<number>;
   logo_url: string | null;
