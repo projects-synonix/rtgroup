@@ -26,34 +26,34 @@ export const menuConfig: MenuConfig = {
     icon: <LayoutDashboard />,
     route: "/",
     minRole: Role.USER,
-    folderPath: 'public/uploads/dashboard'
+    folderPath: '/uploads/dashboard'
   },
   profile: {
     label: "Profile",
     icon: <CircleUser />,
     route: "/profile",
     minRole: Role.USER,
-    folderPath: 'public/uploads/profile'
+    folderPath: '/uploads/profile'
   },
   basicdetails: {
     label: "Basic Details & Contact Information",
     icon: <NotebookTabs />,
     route: "basicdetails",
     minRole: Role.USER,
-    folderPath: 'public/uploads/basicdetails'
+    folderPath: '/uploads/basicdetails'
   },
   secret: {
     label: "Secret",
     icon: <Lock />,
     route: "secret",
     minRole: Role.SUPERADMIN,
-    folderPath: 'public/uploads/secret'
+    folderPath: '/uploads/secret'
   },
   services: {
     label: "Services",
     icon: <Boxes />,
     route: "services",
     minRole: Role.USER,
-    folderPath: 'public/uploads/services'
+    folderPath: '/uploads/services'
   },
 };

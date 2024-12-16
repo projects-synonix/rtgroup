@@ -5,6 +5,7 @@ import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import path from "path";
 import { Module, menuConfig as moduleSettings } from "./menu";
+import { getFilePath } from "./utils";
 const pipelineAsync = promisify(pipeline);
 
 export async function uploadFile(file:File, module: Module) {
@@ -26,6 +27,5 @@ export async function uploadFile(file:File, module: Module) {
   }
 }
 
-export function getFilePath(module:Module){
-  return(moduleSettings[module].folderPath)
-}
+
+

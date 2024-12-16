@@ -88,13 +88,10 @@ const CropperComponent = ({
         );
         setZoom(1);
         setCrop({ x: 0, y: 0 });
-        console.log(inputRef.current,']]]]]]]]]]]]')
         if(inputRef.current){
           let dataTransfer = new DataTransfer();
           dataTransfer.items.add(croppedImageFile);
-          console.log(dataTransfer.items,dataTransfer.files)
           inputRef.current.files = dataTransfer.files;
-          console.log(inputRef.current.files,'aaaaaaaaaaaaaaa')
         }
       }
     } catch (error) {

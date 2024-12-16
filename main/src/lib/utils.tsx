@@ -8,6 +8,7 @@ import {
   Youtube,
 } from "lucide-react";
 import { QueryError } from "mysql2";
+import { menuConfig as moduleSettings, Module } from "./menu";
 
 export function throwDBError(error: QueryError) {
   let dbError = error as QueryError;
@@ -44,3 +45,7 @@ export const getSocialMediaIcon = (size: number, media: string) => {
       return <Globe size={size} />;
   }
 };
+
+export function getFilePath(module:Module){
+  return(moduleSettings[module].folderPath)
+}

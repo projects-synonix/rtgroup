@@ -40,8 +40,13 @@ const img: React.CSSProperties = {
 
 export type FileWithPreview = File & { preview?: string };
 
-export function ImageUpload() {
-  const [file, setFile] = useState<FileWithPreview | null>(null);
+export function ImageUpload({
+  file,
+  setFile,
+}: {
+  file: FileWithPreview;
+  setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => console.log(fileInputRef.current, "refffff"), []);
   const { getRootProps, getInputProps } = useDropzone({
@@ -115,7 +120,7 @@ export function ImageUpload() {
         <div style={thumbsContainer}>{thumbs}</div>
       </section>
       {/* hidden input for form */}
-      <Input ref={fileInputRef} name="file" type="file" className={'hidden'} />
+      <Input ref={fileInputRef} name="file" type="file" className={"hidden"} />
       {file && (
         <>
           <CropperComponent
