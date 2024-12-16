@@ -14,4 +14,3 @@ export async function verifyPasswordHash(hash: string, password: string): Promis
 	return await verify(hash, password);
 }
 
-

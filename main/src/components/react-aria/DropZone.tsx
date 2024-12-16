@@ -54,12 +54,10 @@ export function ImageUpload() {
           preview: URL.createObjectURL(acceptedFiles[0]),
         }),
       );
-      console.log(fileInputRef.current, "reffff...//");
       if (fileInputRef.current) {
         let dataTransfer = new DataTransfer();
         dataTransfer.items.add(acceptedFiles[0]);
         fileInputRef.current.files = dataTransfer.files;
-        console.log(fileInputRef.current.files, "aaaaaaaaaaaaaaa");
       }
     },
     onDragEnter: () => {},
@@ -97,7 +95,7 @@ export function ImageUpload() {
     return () => URL.revokeObjectURL(file?.preview!);
   }, [file]);
 
-  const [errorMsg, formAction, isPending] = useActionState(uploadFile, null);
+  // const [errorMsg, formAction, isPending] = useActionState(uploadFile, null);
   // const onSubmit = async (formData: FormData) => {
   //   formData.append("file", file!);
   //   console.log(formData, "-----=======");
@@ -117,7 +115,7 @@ export function ImageUpload() {
         <div style={thumbsContainer}>{thumbs}</div>
       </section>
       {/* hidden input for form */}
-      <Input ref={fileInputRef} name="file" />
+      <Input ref={fileInputRef} name="file" type="file" className={'hidden'} />
       {file && (
         <>
           <CropperComponent

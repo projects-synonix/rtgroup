@@ -4,13 +4,12 @@ import { createWriteStream } from "fs";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import path from "path";
-
+import { Module, menuConfig as moduleSettings } from "./menu";
 const pipelineAsync = promisify(pipeline);
 
-export async function uploadFile(prevState:any,formData: FormData) {
-    console.log(formData,"===================")
-  const file = formData.get("file") as File;
-  const targetPath = path.join(process.cwd(), "public/uploads"); // Directory to save the file
+export async function uploadFile(file:File, module: Module) {
+
+  const targetPath = path.join(process.cwd(), getFilePath(module)); // Directory to save the file
   const filename = `upload-${Date.now()}-${file.name}`;
   const filePath = path.join(targetPath, filename);
 
@@ -20,9 +19,13 @@ export async function uploadFile(prevState:any,formData: FormData) {
       Readable.from(Buffer.from(buffer)), // Readable stream from the buffer
       createWriteStream(filePath), // Write stream to the target file
     );
-    return { success: true, filePath: `/uploads/${filename}` };
+    return filename;
   } catch (error) {
     console.error("Error uploading file:", error);
-    return { success: false, error: "File upload failed" };
+    return null;
   }
+}
+
+export function getFilePath(module:Module){
+  return(moduleSettings[module].folderPath)
 }

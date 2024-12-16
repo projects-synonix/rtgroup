@@ -17,7 +17,7 @@ export type Module =
 
 export type MenuConfig = Record<
   Module,
-  { label: string; icon: JSX.Element; route: string; minRole: Role }
+  { label: string; icon: JSX.Element; route: string; minRole: Role, folderPath: string }
 >;
 
 export const menuConfig: MenuConfig = {
@@ -26,29 +26,34 @@ export const menuConfig: MenuConfig = {
     icon: <LayoutDashboard />,
     route: "/",
     minRole: Role.USER,
+    folderPath: 'public/uploads/dashboard'
   },
   profile: {
     label: "Profile",
     icon: <CircleUser />,
     route: "/profile",
     minRole: Role.USER,
+    folderPath: 'public/uploads/profile'
   },
   basicdetails: {
     label: "Basic Details & Contact Information",
     icon: <NotebookTabs />,
     route: "basicdetails",
     minRole: Role.USER,
+    folderPath: 'public/uploads/basicdetails'
   },
   secret: {
     label: "Secret",
     icon: <Lock />,
     route: "secret",
     minRole: Role.SUPERADMIN,
+    folderPath: 'public/uploads/secret'
   },
   services: {
     label: "Services",
     icon: <Boxes />,
     route: "services",
     minRole: Role.USER,
+    folderPath: 'public/uploads/services'
   },
 };

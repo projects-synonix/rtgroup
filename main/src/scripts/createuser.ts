@@ -9,7 +9,7 @@ const password = args.password;
 const role = Role.SUPERADMIN;
 
 export async function test(){
-    console.log(process.argv[2])
+    console.log(password,typeof password)
 
         await createUser(username,password,role);
         // await getUser(1);
