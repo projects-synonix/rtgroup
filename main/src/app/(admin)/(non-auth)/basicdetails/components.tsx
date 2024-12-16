@@ -4,7 +4,7 @@ import { TextField, TextFieldArea } from "@/components/react-aria/TextField";
 import { BasicDetails } from "@/types/kysely";
 import { Pencil } from "lucide-react";
 import { useActionState, useState } from "react";
-import { ImageUpload } from "@/components/react-aria/DropZone";
+import { FileWithPreview, ImageUpload } from "@/components/react-aria/DropZone";
 import { Form } from "@/components/react-aria/Form";
 import { testAction } from "./actions";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/react-aria/Tabs";
@@ -77,6 +77,7 @@ export function BasicDetailsView({ details }: { details: BasicDetails }) {
 
 function EditBasicDetailView({ details }: { details: BasicDetails }) {
   const [errMsg, formAction, isPending] = useActionState(testAction, null);
+  const [file, setFile] = useState<FileWithPreview | null>(null);
   return (
     <>
       <Form action={formAction}>
@@ -95,7 +96,7 @@ function EditBasicDetailView({ details }: { details: BasicDetails }) {
           defaultValue={details.about_us}
         />
         {/* <TextField value="hekkii" name="hello"/> */}
-        <ImageUpload />
+        <ImageUpload file={file} setFile={setFile} />
         <Button type="submit">submit</Button>
       </Form>
     </>

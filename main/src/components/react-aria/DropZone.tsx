@@ -44,7 +44,7 @@ export function ImageUpload({
   file,
   setFile,
 }: {
-  file: FileWithPreview;
+  file: FileWithPreview | null;
   setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
