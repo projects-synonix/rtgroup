@@ -38,21 +38,21 @@ export const menuConfig: MenuConfig = {
   basicdetails: {
     label: "Basic Details & Contact Information",
     icon: <NotebookTabs />,
-    route: "basicdetails",
+    route: "/basicdetails",
     minRole: Role.USER,
     folderPath: '/uploads/basicdetails'
   },
   secret: {
     label: "Secret",
     icon: <Lock />,
-    route: "secret",
+    route: "/secret",
     minRole: Role.SUPERADMIN,
     folderPath: '/uploads/secret'
   },
   services: {
     label: "Services",
     icon: <Boxes />,
-    route: "services",
+    route: "/services",
     minRole: Role.USER,
     folderPath: '/uploads/services'
   },

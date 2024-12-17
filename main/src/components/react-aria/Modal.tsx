@@ -1,5 +1,5 @@
-import React from 'react';
-import { ModalOverlay, ModalOverlayProps, Modal as RACModal } from 'react-aria-components';
+import React, { useContext } from 'react';
+import { ModalOverlay, ModalOverlayProps, OverlayTriggerStateContext, Modal as RACModal } from 'react-aria-components';
 import { tv } from 'tailwind-variants';
 
 const overlayStyles = tv({
@@ -32,4 +32,9 @@ export function Modal(props: ModalOverlayProps) {
       <RACModal {...props} className={modalStyles} />
     </ModalOverlay>
   );
+}
+
+export function useModalState(){
+  const state = useContext(OverlayTriggerStateContext);
+  return state
 }

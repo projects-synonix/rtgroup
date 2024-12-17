@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { QueryError } from "mysql2";
 import { menuConfig as moduleSettings, Module } from "./menu";
+import path from "path";
+import { FileWithPreview } from "@/components/react-aria/DropZone";
 
 export function throwDBError(error: QueryError) {
   let dbError = error as QueryError;
@@ -46,6 +48,13 @@ export const getSocialMediaIcon = (size: number, media: string) => {
   }
 };
 
-export function getFilePath(module:Module){
-  return(moduleSettings[module].folderPath)
+export function getFilePath({module,fileName}:{module:Module,fileName?:string}){
+  return path.join(moduleSettings[module].folderPath, fileName ? fileName : "")
+}
+
+
+export function fileToFileWithPreview(file:File):FileWithPreview{
+  return Object.assign(file, {
+    preview: URL.createObjectURL(file),
+  });
 }

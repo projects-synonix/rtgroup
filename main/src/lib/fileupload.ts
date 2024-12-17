@@ -10,7 +10,7 @@ const pipelineAsync = promisify(pipeline);
 
 export async function uploadFile(file:File, module: Module) {
 
-  const targetPath = path.join(process.cwd(), getFilePath(module)); // Directory to save the file
+  const targetPath = path.join(process.cwd(), getFilePath({module})); // Directory to save the file
   const filename = `upload-${Date.now()}-${file.name}`;
   const filePath = path.join(targetPath, filename);
 

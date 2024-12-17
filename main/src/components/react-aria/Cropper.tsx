@@ -4,22 +4,28 @@ import Cropper, { Area } from "react-easy-crop";
 import "./styles.css";
 import { FileWithPreview } from "./DropZone";
 import { Button } from "./Button";
+import { useModalState } from "./Modal";
+
+export type CropperProps = {
+  file: File;
+  setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  aspectRatio: number;
+  isModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const CropperComponent = ({
   file,
   setFile,
   // formAction,
-  inputRef
-}: {
-  file: File;
-  setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
-  inputRef:  React.RefObject<HTMLInputElement | null>;
-  // formAction: (payload: FormData) => void
-}) => {
+  inputRef,
+  aspectRatio,
+  isModalOpen,
+}: CropperProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [area, setArea] = useState<Area | null>(null);
-
+  const state = useModalState();
   // Function to create a cropped image file
   const getCroppedImg = async (
     image: string,
@@ -88,10 +94,14 @@ const CropperComponent = ({
         );
         setZoom(1);
         setCrop({ x: 0, y: 0 });
-        if(inputRef.current){
+        if (inputRef.current) {
           let dataTransfer = new DataTransfer();
           dataTransfer.items.add(croppedImageFile);
           inputRef.current.files = dataTransfer.files;
+        }
+        if (isModalOpen) {
+          console.log("eeeeeeeeeeeeeeeeeeeeeeeeeee");
+          isModalOpen(false);
         }
       }
     } catch (error) {
@@ -103,19 +113,19 @@ const CropperComponent = ({
   return (
     <>
       <div className="relative h-96 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-        <div className="">
-          <Cropper
-            image={imgUrl}
-            crop={crop}
-            zoom={zoom}
-            aspect={16 / 8}
-            onCropChange={setCrop}
-            onCropComplete={onCropComplete}
-            onZoomChange={setZoom}
-          />
-        </div>
+        <Cropper
+          image={imgUrl}
+          crop={crop}
+          zoom={zoom}
+          aspect={aspectRatio}
+          onCropChange={setCrop}
+          onCropComplete={onCropComplete}
+          onZoomChange={setZoom}
+        />
       </div>
+      <br />
       <div className="float-right flex gap-2">
+
         <Button onPress={cropper}>Crop</Button>
         {/* <form action={formAction}>
         <Button variant="success" type="submit">Save</Button>

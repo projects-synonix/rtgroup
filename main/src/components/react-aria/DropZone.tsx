@@ -127,6 +127,7 @@ export function ImageUpload({
             file={file}
             setFile={setFile}
             inputRef={fileInputRef}
+            aspectRatio={16/9}
             // formAction={onSubmit}
           />
         </>
@@ -134,3 +135,4 @@ export function ImageUpload({
     </>
   );
 }
+
