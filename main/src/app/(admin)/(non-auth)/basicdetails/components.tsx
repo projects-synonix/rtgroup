@@ -110,12 +110,16 @@ function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, s
   const [formState, formAction, isPending] = useActionState(testAction, null);
   const [file, setFile] = useState<FileWithPreview | null>(null);
   async function onSubmit(formData:FormData){
-    formData.append('file2',file as Blob);
+    if(file!==null){
+      formData.append('file2',file as Blob);
+      // send old file name to delete that
+      formData.append('old_file_name',details.logo_url!);
+    }
     let res = formAction(formData);
     console.log(res);
   }
   const router = useRouter();
-  useEffect(()=>{if(formState?.success){setEditMode(false);router.refresh()}},[formState]);
+  useEffect(()=>{if(formState?.success){setEditMode(false);}},[formState]);
 
   return (
     <>

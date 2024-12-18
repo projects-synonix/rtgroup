@@ -84,7 +84,7 @@ export function ProtectedComponent({
     return { children };
   } else {
     if (fallback) {
-      return <>You don't have enough permission</>;
+      return <>You dont have enough permission</>;
     } else {
       return <></>;
     }

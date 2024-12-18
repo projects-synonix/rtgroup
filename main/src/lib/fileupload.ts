@@ -8,16 +8,14 @@ import { Module, menuConfig as moduleSettings } from "./menu";
 import { getFilePath } from "./utils";
 const pipelineAsync = promisify(pipeline);
 
-export async function uploadFile(file:File, module: Module,replace:boolean) {
+export async function uploadFile(file:File, module: Module) {
 
   const targetPath = path.join(process.cwd(),'/public', getFilePath({module})); // Directory to save the file
-  let filename = file.name;
+  let filename = `upload-${Date.now()}-${file.name}`;
   let filePath = path.join(targetPath, filename);
-  if(!replace){
-    while(await fileExists(filePath)){
-      filename = `upload-${Date.now()}-${file.name}`;
-      filePath = path.join(targetPath, filename);
-    }
+  while(await fileExists(filePath)){
+    filename = `upload-${Date.now()}-${file.name}`;
+    filePath = path.join(targetPath, filename);
   }
   try {
     
@@ -34,7 +32,7 @@ export async function uploadFile(file:File, module: Module,replace:boolean) {
 }
 
 export async function deleteFile(module:Module,fileName:string){
-  const targetPath = path.join(process.cwd(),getFilePath({module,fileName}));
+  const targetPath = path.join(process.cwd(),'/public',getFilePath({module,fileName}));
   unlink(targetPath,(err=>{
     if(err){
       throw new Error(`Unable to delete file, cause: ${err.cause}, msg: ${err.message}`);

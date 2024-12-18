@@ -1,7 +1,7 @@
 "use server";
 
 import { updateBasicDetails } from "@/lib/basic_details";
-import { uploadFile } from "@/lib/fileupload";
+import { deleteFile, uploadFile } from "@/lib/fileupload";
 import { menuConfig } from "@/lib/menu";
 import { getSession } from "@/lib/session";
 import { unlink } from "fs";
@@ -27,7 +27,7 @@ type BasicDetailSchemaType = z.infer<typeof BasicDetailSchema>;
 
 export async function testAction(prevState: any, formData: FormData) {
   let file = formData.get("file2") as File;
-  console.log(file)
+  let oldFileName = formData.get('old_file_name') as string;
   let data: BasicDetailSchemaType = {
     company_name: formData.get("company_name") as string,
     about_us: formData.get("about_us") as string,
@@ -38,8 +38,9 @@ export async function testAction(prevState: any, formData: FormData) {
   if (result.success) {
     let filenamereturned;
     if (file !== undefined && file !== null) {
-      file = new File([file], "logo"); // to replace the old
-      filenamereturned = await uploadFile(file, "basicdetails", true);
+      // delete old file
+      await deleteFile('basicdetails',oldFileName);
+      filenamereturned = await uploadFile(file, "basicdetails");
     }
     let res = await updateBasicDetails({
       about_us: data.about_us,

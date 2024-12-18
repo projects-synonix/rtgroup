@@ -78,6 +78,7 @@ export function ImageUpload({
       <div style={thumb} key={file.name}>
         <div style={thumbInner}>
           <img
+          alt="df"
             src={file.preview}
             style={img}
             onLoad={() => {
