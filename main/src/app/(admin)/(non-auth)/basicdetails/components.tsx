@@ -144,6 +144,8 @@ function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, s
         />
         {/* <TextField value="hekkii" name="hello"/> */}
         {/* <ImageUpload file={file} setFile={setFile} /> */}
+        <div>
+        <Label>Logo</Label>
         <ImageChangeWithCrop
         file={file}
         setFile={setFile}
@@ -152,6 +154,7 @@ function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, s
             fileName: details.logo_url!,
           })}
         />
+        </div>
         <Button type="submit">Submit</Button>
       </Form>
     </>
@@ -172,7 +175,7 @@ function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPr
   console.log("current file in input", inputRef.current?.files);
   return (
     <>
-      <Label>Logo</Label>
+
       <div className="relative flex gap-2 items-center">
         {file === null ? (
           <Image src={url} width={100} height={100} alt="Image unavailable" unoptimized/>
