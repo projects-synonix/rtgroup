@@ -1,6 +1,6 @@
 "use server";
 
-import { createWriteStream } from "fs";
+import { createWriteStream, unlink, promises as fss } from "fs";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import path from "path";
@@ -8,13 +8,19 @@ import { Module, menuConfig as moduleSettings } from "./menu";
 import { getFilePath } from "./utils";
 const pipelineAsync = promisify(pipeline);
 
-export async function uploadFile(file:File, module: Module) {
+export async function uploadFile(file:File, module: Module,replace:boolean) {
 
-  const targetPath = path.join(process.cwd(), getFilePath({module})); // Directory to save the file
-  const filename = `upload-${Date.now()}-${file.name}`;
-  const filePath = path.join(targetPath, filename);
-
+  const targetPath = path.join(process.cwd(),'/public', getFilePath({module})); // Directory to save the file
+  let filename = file.name;
+  let filePath = path.join(targetPath, filename);
+  if(!replace){
+    while(await fileExists(filePath)){
+      filename = `upload-${Date.now()}-${file.name}`;
+      filePath = path.join(targetPath, filename);
+    }
+  }
   try {
+    
     const buffer = await file.arrayBuffer(); // Convert the File object to a buffer
     await pipelineAsync(
       Readable.from(Buffer.from(buffer)), // Readable stream from the buffer
@@ -27,5 +33,25 @@ export async function uploadFile(file:File, module: Module) {
   }
 }
 
+export async function deleteFile(module:Module,fileName:string){
+  const targetPath = path.join(process.cwd(),getFilePath({module,fileName}));
+  unlink(targetPath,(err=>{
+    if(err){
+      throw new Error(`Unable to delete file, cause: ${err.cause}, msg: ${err.message}`);
+    }else{
+      console.log(targetPath, 'deleted')
+    }
+  }))
+}
 
-
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await fss.access(filePath, fss.constants.F_OK);
+    return true;
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return false; // File doesn't exist
+    }
+    throw error; // Re-throw other potential errors
+  }
+}

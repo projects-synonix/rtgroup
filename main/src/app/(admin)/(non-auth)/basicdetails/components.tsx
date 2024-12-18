@@ -3,7 +3,7 @@ import { Button } from "@/components/react-aria/Button";
 import { TextField, TextFieldArea } from "@/components/react-aria/TextField";
 import { BasicDetails } from "@/types/kysely";
 import { Pencil, SaveIcon, Upload } from "lucide-react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { FileWithPreview, ImageUpload } from "@/components/react-aria/DropZone";
 import { Form } from "@/components/react-aria/Form";
 import { testAction } from "./actions";
@@ -35,6 +35,8 @@ import { Input, Label } from "@/components/react-aria/Field";
 import { Dialog } from "@/components/react-aria/Dialog";
 import { Modal } from "@/components/react-aria/Modal";
 import { CropperComponent } from "@/components/react-aria/Cropper";
+import { sendNotification, toastQueue } from "@/components/Toasts/toast";
+import { useRouter } from "next/navigation";
 
 export function BasicDetailComponent({ details }: { details: BasicDetails }) {
   const [editMode, setEditMode] = useState(false);
@@ -43,7 +45,7 @@ export function BasicDetailComponent({ details }: { details: BasicDetails }) {
     <>
       <div className="rounded-md border-2 p-2 drop-shadow-2">
         {editMode ? (
-          <EditBasicDetailView details={details} />
+          <EditBasicDetailView details={details} setEditMode={setEditMode} />
         ) : (
           <BasicDetailsView details={details} />
         )}
@@ -99,21 +101,32 @@ export function BasicDetailsView({ details }: { details: BasicDetails }) {
       </div>
       <br />
       <span className="font-medium text-body dark:text-bodydark">Logo</span>
-      <Image src={logo_url} width={100} height={100} alt={"logo url"} />
+      <Image src={logo_url} width={100} height={100} alt={"logo url"} unoptimized/>
     </>
   );
 }
 
-function EditBasicDetailView({ details }: { details: BasicDetails }) {
-  const [errMsg, formAction, isPending] = useActionState(testAction, null);
+function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, setEditMode:Dispatch<SetStateAction<boolean>> }) {
+  const [formState, formAction, isPending] = useActionState(testAction, null);
   const [file, setFile] = useState<FileWithPreview | null>(null);
+  async function onSubmit(formData:FormData){
+    formData.append('file2',file as Blob);
+    let res = formAction(formData);
+    console.log(res);
+  }
+  const router = useRouter();
+  useEffect(()=>{if(formState?.success){setEditMode(false);router.refresh()}},[formState]);
+
   return (
     <>
-      <Form action={formAction}>
+      <Form  action={onSubmit}>
         <TextField
           className={"w-fit"}
           defaultValue={details.company_name}
           label="Company Name"
+          minLength={3}
+          maxLength={95}
+          name="company_name"
         />
 
         <TextFieldArea
@@ -123,10 +136,13 @@ function EditBasicDetailView({ details }: { details: BasicDetails }) {
           name="about_us"
           label="About Us"
           defaultValue={details.about_us}
+          maxLength={950}
         />
         {/* <TextField value="hekkii" name="hello"/> */}
         {/* <ImageUpload file={file} setFile={setFile} /> */}
         <ImageChangeWithCrop
+        file={file}
+        setFile={setFile}
           url={getFilePath({
             module: "basicdetails",
             fileName: details.logo_url!,
@@ -138,17 +154,14 @@ function EditBasicDetailView({ details }: { details: BasicDetails }) {
   );
 }
 
-function ImageChangeWithCrop({ url }: { url: string }) {
+function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPreview|null,setFile:Dispatch<SetStateAction<FileWithPreview|null>> }) {
   // show a preview of image and an file input
   // if a new file is added to input use that image for preview
   // if the file is removed, show the preview from url.
-  const [file, setFile] = useState<FileWithPreview | null>(null);
+  // const [file, setFile] = useState<FileWithPreview | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (file === null && inputRef.current !== null) {
-      inputRef.current.files = null;
-    }
     // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
     return () => URL.revokeObjectURL(file?.preview!);
   }, [file]);
@@ -158,7 +171,7 @@ function ImageChangeWithCrop({ url }: { url: string }) {
       <Label>Logo</Label>
       <div className="relative flex gap-2 items-center">
         {file === null ? (
-          <Image src={url} width={100} height={100} alt="Image unavailable" />
+          <Image src={url} width={100} height={100} alt="Image unavailable" unoptimized/>
         ) : (
           <div className="flex flex-col justify-center">
             <Image
@@ -166,6 +179,7 @@ function ImageChangeWithCrop({ url }: { url: string }) {
               width={100}
               height={100}
               alt="Unable to show preview"
+              unoptimized
             />
             <Button
               variant="destructive"
@@ -176,8 +190,8 @@ function ImageChangeWithCrop({ url }: { url: string }) {
             </Button>
           </div>
         )}
-        {file &&
-        <input
+        {/* {file &&
+        <Input
           name="file"
           type="file"
           className="hidden"
@@ -185,16 +199,19 @@ function ImageChangeWithCrop({ url }: { url: string }) {
           ref={inputRef}
         />
         
-        }
+        } */}
         <FileTrigger
           acceptedFileTypes={["image/*"]}
           onSelect={(e) => {
             if (e) {
-              setFile(fileToFileWithPreview(e.item(0)!));
-              if (inputRef.current) {
-                inputRef.current.files = e;
+              console.log(e.item(0)!.size)
+              if(e.item(0)!.size>=5242880){
+                sendNotification({message:'File size should be less than 5MB!'})
+              }else{
+                setFile(fileToFileWithPreview(e.item(0)!));
+                // close the crop model
+                setIsOpen(!isOpen);
               }
-              setIsOpen(!isOpen);
             }
           }}
         >

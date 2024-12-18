@@ -11,6 +11,7 @@ export default async function Page() {
       <Breadcrumb pageName="Basic Details & Contact Information" />
       {/* <BasicDetailComponent details={details!}/> */}
       <TabView details={details!}/>
+
     </>
   );
 }

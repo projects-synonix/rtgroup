@@ -3,6 +3,7 @@ import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { useUser } from "@/lib/user-context";
+import { GlobalToastRegion, toastQueue } from "@/components/Toasts/toast";
 
 export default function DefaultLayout({
   children,
@@ -30,6 +31,7 @@ export default function DefaultLayout({
           <main>
             <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
               {children}
+              <GlobalToastRegion state={toastQueue}/>
             </div>
           </main>
           {/* <!-- ===== Main Content End ===== --> */}

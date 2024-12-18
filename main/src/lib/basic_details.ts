@@ -28,6 +28,7 @@ export async function updateBasicDetails(details:Partial<UpdateBasicDetails>){
     }
     try{
         let res = await db.updateTable('basic_details').set(updateValues).where('id','=',1).executeTakeFirst();
+        return res.numUpdatedRows
     }catch(e){
         throwDBError(e as QueryError);
     }
