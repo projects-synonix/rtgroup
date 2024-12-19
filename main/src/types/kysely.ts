@@ -12,6 +12,9 @@ export interface Database {
   pet: PetTable;
   user: UserTable;
   basic_details: BasicDetailsTable;
+  address: AddressTable;
+  phone: PhoneTable;
+  email: EmailTable;
 }
 
 // This interface describes the `person` table to Kysely. Table
@@ -97,3 +100,34 @@ export interface BasicDetailsTable {
 export type BasicDetails = Selectable<BasicDetailsTable>;
 export type NewBasicDetails = Insertable<BasicDetailsTable>;
 export type UpdateBasicDetails = Updateable<BasicDetailsTable>;
+
+
+export interface AddressTable {
+  created_at: Generated<Date>;
+  id: Generated<number>;
+  line_1: string;
+  line_2: string;
+  line_3: string;
+}
+
+export type Address = Selectable<AddressTable>;
+export type NewAddress = Insertable<AddressTable>;
+export type UpdateAddress = Updateable<AddressTable>;
+
+export interface EmailTable {
+  email: string;
+  id: Generated<number>;
+}
+
+export type Email = Selectable<EmailTable>;
+export type NewEmail = Insertable<EmailTable>;
+export type UpdateEmail = Updateable<EmailTable>;
+
+export interface PhoneTable {
+  id: Generated<number>;
+  phone: string;
+}
+
+export type Phone = Selectable<PhoneTable>;
+export type NewPhone = Insertable<PhoneTable>;
+export type UpdatePhone = Updateable<PhoneTable>;

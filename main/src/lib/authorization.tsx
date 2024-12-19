@@ -36,7 +36,7 @@ export namespace Role {
   }
 }
 
-type Action = "read" | "create" | "edit" | "destroy";
+export type Action = "read" | "create" | "edit" | "destroy";
 
 const allActions: Action[] = ["read", "create", "destroy", "edit"];
 

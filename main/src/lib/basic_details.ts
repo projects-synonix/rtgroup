@@ -16,16 +16,16 @@ export async function getBasicDetails(){
 
 
 export async function updateBasicDetails(details:Partial<UpdateBasicDetails>){
-    let updateValues:Partial<UpdateBasicDetails> = {};
-    if (details.about_us!==undefined){
-        updateValues.about_us = details.about_us;
-    }
-    if (details.logo_url!==undefined){
-        updateValues.logo_url = details.logo_url;
-    }
-    if (details.company_name!==undefined){
-        updateValues.company_name = details.company_name;
-    }
+    let updateValues:Partial<UpdateBasicDetails> = {...details};
+    // if (details.about_us!==undefined){
+    //     updateValues.about_us = details.about_us;
+    // }
+    // if (details.logo_url!==undefined){
+    //     updateValues.logo_url = details.logo_url;
+    // }
+    // if (details.company_name!==undefined){
+    //     updateValues.company_name = details.company_name;
+    // }
     try{
         let res = await db.updateTable('basic_details').set(updateValues).where('id','=',1).executeTakeFirst();
         return res.numUpdatedRows

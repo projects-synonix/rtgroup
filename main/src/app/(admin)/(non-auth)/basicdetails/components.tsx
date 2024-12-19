@@ -1,12 +1,25 @@
 "use client";
 import { Button } from "@/components/react-aria/Button";
 import { TextField, TextFieldArea } from "@/components/react-aria/TextField";
-import { BasicDetails } from "@/types/kysely";
+import { Address, BasicDetails } from "@/types/kysely";
 import { Pencil, SaveIcon, Upload } from "lucide-react";
-import { Dispatch, SetStateAction, useActionState, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useActionState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FileWithPreview, ImageUpload } from "@/components/react-aria/DropZone";
 import { Form } from "@/components/react-aria/Form";
-import { testAction } from "./actions";
+import {
+  addAddressAction,
+  basicDetailUpdateAction,
+  FormState,
+} from "./actions";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/react-aria/Tabs";
 import Image from "next/image";
 import path from "path";
@@ -64,7 +77,13 @@ export function BasicDetailComponent({ details }: { details: BasicDetails }) {
   );
 }
 
-export function TabView({ details }: { details: BasicDetails }) {
+export function TabView({
+  details,
+  addresses,
+}: {
+  details: BasicDetails;
+  addresses: Address[];
+}) {
   return (
     <Tabs>
       <TabList>
@@ -75,7 +94,7 @@ export function TabView({ details }: { details: BasicDetails }) {
         <BasicDetailComponent details={details} />
       </TabPanel>
       <TabPanel id="contact">
-        <ContactListView />
+        <ContactListView addresses={addresses} />
       </TabPanel>
     </Tabs>
   );
@@ -101,29 +120,47 @@ export function BasicDetailsView({ details }: { details: BasicDetails }) {
       </div>
       <br />
       <span className="font-medium text-body dark:text-bodydark">Logo</span>
-      <Image src={logo_url} width={100} height={100} alt={"logo url"} unoptimized/>
+      <Image
+        src={logo_url}
+        width={100}
+        height={100}
+        alt={"logo url"}
+        unoptimized
+      />
     </>
   );
 }
 
-function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, setEditMode:Dispatch<SetStateAction<boolean>> }) {
-  const [formState, formAction, isPending] = useActionState(testAction, null);
+function EditBasicDetailView({
+  details,
+  setEditMode,
+}: {
+  details: BasicDetails;
+  setEditMode: Dispatch<SetStateAction<boolean>>;
+}) {
+  const [formState, formAction, isPending] = useActionState(
+    basicDetailUpdateAction,
+    null,
+  );
   const [file, setFile] = useState<FileWithPreview | null>(null);
-  async function onSubmit(formData:FormData){
-    if(file!==null){
-      formData.append('file2',file as Blob);
+  async function onSubmit(formData: FormData) {
+    if (file !== null) {
+      formData.append("file2", file as Blob);
       // send old file name to delete that
-      formData.append('old_file_name',details.logo_url!);
+      formData.append("old_file_name", details.logo_url!);
     }
     let res = formAction(formData);
     console.log(res);
   }
-  const router = useRouter();
-  useEffect(()=>{if(formState?.success){setEditMode(false);}},[formState]);
+  useEffect(() => {
+    if (formState?.success) {
+      setEditMode(false);
+    }
+  }, [formState]);
 
   return (
     <>
-      <Form  action={onSubmit}>
+      <Form action={onSubmit}>
         <TextField
           className={"w-fit"}
           defaultValue={details.company_name}
@@ -142,18 +179,16 @@ function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, s
           defaultValue={details.about_us}
           maxLength={950}
         />
-        {/* <TextField value="hekkii" name="hello"/> */}
-        {/* <ImageUpload file={file} setFile={setFile} /> */}
         <div>
-        <Label>Logo</Label>
-        <ImageChangeWithCrop
-        file={file}
-        setFile={setFile}
-          url={getFilePath({
-            module: "basicdetails",
-            fileName: details.logo_url!,
-          })}
-        />
+          <Label>Logo</Label>
+          <ImageChangeWithCrop
+            file={file}
+            setFile={setFile}
+            url={getFilePath({
+              module: "basicdetails",
+              fileName: details.logo_url!,
+            })}
+          />
         </div>
         <Button type="submit">Submit</Button>
       </Form>
@@ -161,7 +196,15 @@ function EditBasicDetailView({ details,setEditMode }: { details: BasicDetails, s
   );
 }
 
-function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPreview|null,setFile:Dispatch<SetStateAction<FileWithPreview|null>> }) {
+function ImageChangeWithCrop({
+  url,
+  file,
+  setFile,
+}: {
+  url: string;
+  file: FileWithPreview | null;
+  setFile: Dispatch<SetStateAction<FileWithPreview | null>>;
+}) {
   // show a preview of image and an file input
   // if a new file is added to input use that image for preview
   // if the file is removed, show the preview from url.
@@ -175,10 +218,15 @@ function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPr
   console.log("current file in input", inputRef.current?.files);
   return (
     <>
-
-      <div className="relative flex gap-2 items-center">
+      <div className="relative flex items-center gap-2">
         {file === null ? (
-          <Image src={url} width={100} height={100} alt="Image unavailable" unoptimized/>
+          <Image
+            src={url}
+            width={100}
+            height={100}
+            alt="Image unavailable"
+            unoptimized
+          />
         ) : (
           <div className="flex flex-col justify-center">
             <Image
@@ -211,10 +259,12 @@ function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPr
           acceptedFileTypes={["image/*"]}
           onSelect={(e) => {
             if (e) {
-              console.log(e.item(0)!.size)
-              if(e.item(0)!.size>=5242880){
-                sendNotification({message:'File size should be less than 5MB!'})
-              }else{
+              console.log(e.item(0)!.size);
+              if (e.item(0)!.size >= 5242880) {
+                sendNotification({
+                  message: "File size should be less than 5MB!",
+                });
+              } else {
                 setFile(fileToFileWithPreview(e.item(0)!));
                 // close the crop model
                 setIsOpen(!isOpen);
@@ -249,7 +299,7 @@ function ImageChangeWithCrop({ url,file,setFile }: { url: string,file:FileWithPr
   );
 }
 
-function ContactListView() {
+function ContactListView({ addresses }: { addresses: Address[] }) {
   //
   return (
     <>
@@ -257,7 +307,7 @@ function ContactListView() {
         <Disclosure>
           <DisclosureHeader>Addresses</DisclosureHeader>
           <DisclosurePanel>
-            <Example />
+            <AddressTable addresses={addresses} />
           </DisclosurePanel>
         </Disclosure>
         <Disclosure>
@@ -305,50 +355,113 @@ let rows = [
   { id: 9, name: "Budget.xls", date: "1/6/2024", type: "Excel file" },
 ];
 
-export const Example = (args: any) => {
+export const Example = ({ addresses }: { addresses: Address[] }) => {
   let [sortDescriptor, setSortDescriptor] = useState({
     column: "name",
     direction: "ascending",
   });
 
-  let items = useMemo(() => {
-    let items = rows.slice().sort((a, b) =>
-      // @ts-ignore
-      a[sortDescriptor.column].localeCompare(b[sortDescriptor.column]),
-    );
-    if (sortDescriptor.direction === "descending") {
-      items.reverse();
-    }
-    return items;
-  }, [sortDescriptor]);
-
   return (
-    <Table
-      aria-label="Files"
-      {...args}
-      sortDescriptor={sortDescriptor}
-      onSortChange={setSortDescriptor}
-    >
+    <Table aria-label="Addresses">
       <TableHeader>
-        <Column id="name" isRowHeader allowsSorting>
-          Name
+        <Column id="id" isRowHeader allowsSorting>
+          id
         </Column>
-        <Column id="type" allowsSorting>
-          Type
+        <Column id="line_1" allowsSorting>
+          Line 1
         </Column>
-        <Column id="date" allowsSorting>
-          Date Modified
+        <Column id="line_2" allowsSorting>
+          Line2
         </Column>
       </TableHeader>
-      <TableBody items={items}>
+      <TableBody items={addresses}>
         {(row) => (
           <Row>
-            <Cell>{row.name}</Cell>
-            <Cell>{row.type}</Cell>
-            <Cell>{row.date}</Cell>
+            <Cell>{row.id}</Cell>
+            <Cell>{row.line_1}</Cell>
+            <Cell>{row.line_2}</Cell>
           </Row>
         )}
       </TableBody>
     </Table>
   );
 };
+
+function AddNewThing({
+  children,
+  action,
+}: {
+  children: ReactNode;
+  action: (prevState: any, formData: FormData) => Promise<FormState>;
+}) {
+  const [formState, formAction, isPending] = useActionState(action, {
+    success: false,
+    errors: {},
+  });
+  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (formState.success) {
+      setIsOpen(false);
+    }
+  }, [formState]);
+  return (
+    <>
+      <DialogTrigger isOpen={isOpen}>
+        <Button onPress={() => setIsOpen(true)}>Add New</Button>
+        <Modal>
+          <Dialog>
+            <Form action={formAction} validationErrors={formState.errors}>
+              {children}
+              <Button className={"font-semibold"} type="submit">
+                Submit
+              </Button>
+              <Button
+                variant="destructive"
+                className={"font-semibold"}
+                onPress={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+            </Form>
+          </Dialog>
+        </Modal>
+      </DialogTrigger>
+    </>
+  );
+}
+
+function AddressTable({ addresses }: { addresses: Address[] }) {
+  return (
+    <>
+      <div>
+        <div className=" float-right">
+          <AddNewThing action={addAddressAction}>
+            <span className=" text-title-md">Add New Address</span>
+            <TextField
+              label="Line 1"
+              name="line_1"
+              isRequired
+              minLength={3}
+              maxLength={200}
+            />
+            <TextField
+              label="Line 2"
+              name="line_2"
+              isRequired
+              minLength={3}
+              maxLength={200}
+            />
+            <TextField
+              label="Line 3"
+              name="line_3"
+              isRequired
+              minLength={3}
+              maxLength={200}
+            />
+          </AddNewThing>
+        </div>
+        <Example addresses={addresses} />
+      </div>
+    </>
+  );
+}
