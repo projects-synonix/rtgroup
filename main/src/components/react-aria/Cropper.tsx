@@ -9,7 +9,6 @@ import { useModalState } from "./Modal";
 export type CropperProps = {
   file: File;
   setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
-  inputRef: React.RefObject<HTMLInputElement | null>;
   aspectRatio: number;
   isModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -18,7 +17,6 @@ const CropperComponent = ({
   file,
   setFile,
   // formAction,
-  inputRef,
   aspectRatio,
   isModalOpen,
 }: CropperProps) => {
@@ -94,11 +92,7 @@ const CropperComponent = ({
         );
         setZoom(1);
         setCrop({ x: 0, y: 0 });
-        if (inputRef.current) {
-          let dataTransfer = new DataTransfer();
-          dataTransfer.items.add(croppedImageFile);
-          inputRef.current.files = dataTransfer.files;
-        }
+
         if (isModalOpen) {
           console.log("eeeeeeeeeeeeeeeeeeeeeeeeeee");
           isModalOpen(false);

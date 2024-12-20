@@ -1,10 +1,6 @@
 "use server";
 
-import { Address } from "@/types/kysely";
-import { Action } from "./authorization";
 import { db } from "@/database/database";
-import { throwDBError } from "./utils";
-import { QueryError } from "mysql2";
 
 export async function getAddress(id?: number) {
   try {

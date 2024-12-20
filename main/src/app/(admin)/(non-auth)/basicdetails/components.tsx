@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/react-aria/Button";
 import { TextField, TextFieldArea } from "@/components/react-aria/TextField";
-import { Address, BasicDetails } from "@/types/kysely";
-import { Pencil, SaveIcon, Upload } from "lucide-react";
+import { Address, BasicDetails, Phone } from "@/types/kysely";
+import { Pencil, SaveIcon, Trash2, Upload } from "lucide-react";
 import {
   Dispatch,
   ReactNode,
@@ -80,9 +80,11 @@ export function BasicDetailComponent({ details }: { details: BasicDetails }) {
 export function TabView({
   details,
   addresses,
+  phones,
 }: {
   details: BasicDetails;
   addresses: Address[];
+  phones: Phone[];
 }) {
   return (
     <Tabs>
@@ -94,7 +96,7 @@ export function TabView({
         <BasicDetailComponent details={details} />
       </TabPanel>
       <TabPanel id="contact">
-        <ContactListView addresses={addresses} />
+        <ContactListView addresses={addresses} phones={phones}/>
       </TabPanel>
     </Tabs>
   );
@@ -210,12 +212,10 @@ function ImageChangeWithCrop({
   // if the file is removed, show the preview from url.
   // const [file, setFile] = useState<FileWithPreview | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
     return () => URL.revokeObjectURL(file?.preview!);
   }, [file]);
-  console.log("current file in input", inputRef.current?.files);
   return (
     <>
       <div className="relative flex items-center gap-2">
@@ -245,16 +245,7 @@ function ImageChangeWithCrop({
             </Button>
           </div>
         )}
-        {/* {file &&
-        <Input
-          name="file"
-          type="file"
-          className="hidden"
-          multiple={false}
-          ref={inputRef}
-        />
-        
-        } */}
+
         <FileTrigger
           acceptedFileTypes={["image/*"]}
           onSelect={(e) => {
@@ -286,7 +277,6 @@ function ImageChangeWithCrop({
                 <CropperComponent
                   file={file!}
                   setFile={setFile}
-                  inputRef={inputRef}
                   aspectRatio={1 / 1}
                   isModalOpen={setIsOpen}
                 />
@@ -299,7 +289,7 @@ function ImageChangeWithCrop({
   );
 }
 
-function ContactListView({ addresses }: { addresses: Address[] }) {
+function ContactListView({ addresses,phones }: { addresses: Address[],phones:Phone[] }) {
   //
   return (
     <>
@@ -307,7 +297,7 @@ function ContactListView({ addresses }: { addresses: Address[] }) {
         <Disclosure>
           <DisclosureHeader>Addresses</DisclosureHeader>
           <DisclosurePanel>
-            <AddressTable addresses={addresses} />
+            <AddressTableWrapper addresses={addresses} />
           </DisclosurePanel>
         </Disclosure>
         <Disclosure>
@@ -343,86 +333,99 @@ function TableWrapperLayout({
   );
 }
 
-let rows = [
-  { id: 1, name: "Games", date: "6/7/2020", type: "File folder" },
-  { id: 2, name: "Program Files", date: "4/7/2021", type: "File folder" },
-  { id: 3, name: "bootmgr", date: "11/20/2010", type: "System file" },
-  { id: 4, name: "log.txt", date: "1/18/2016", type: "Text Document" },
-  { id: 5, name: "Proposal.ppt", date: "6/18/2022", type: "PowerPoint file" },
-  { id: 6, name: "Taxes.pdf", date: "12/6/2023", type: "PDF Document" },
-  { id: 7, name: "Photos", date: "8/2/2021", type: "File folder" },
-  { id: 8, name: "Documents", date: "3/18/2023", type: "File folder" },
-  { id: 9, name: "Budget.xls", date: "1/6/2024", type: "Excel file" },
-];
-
-export const Example = ({ addresses }: { addresses: Address[] }) => {
-  let [sortDescriptor, setSortDescriptor] = useState({
-    column: "name",
-    direction: "ascending",
-  });
-
+export const AddressTable = ({ addresses }: { addresses: Address[] }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen,setIsDeleteOpen] = useState(false);
+  const [address, selectedAddress] = useState<Address | undefined>(undefined);
+  console.log(isOpen);
   return (
-    <Table aria-label="Addresses">
-      <TableHeader>
-        <Column id="id" isRowHeader allowsSorting>
-          id
-        </Column>
-        <Column id="line_1" allowsSorting>
-          Line 1
-        </Column>
-        <Column id="line_2" allowsSorting>
-          Line2
-        </Column>
-      </TableHeader>
-      <TableBody items={addresses}>
-        {(row) => (
-          <Row>
-            <Cell>{row.id}</Cell>
-            <Cell>{row.line_1}</Cell>
-            <Cell>{row.line_2}</Cell>
-          </Row>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table aria-label="Addresses">
+        <TableHeader>
+          <Column id="line_1" isRowHeader allowsSorting>
+            Line 1
+          </Column>
+          <Column id="line_2" allowsSorting>
+            Line 2
+          </Column>
+          <Column id="line_3" allowsSorting>
+            Line 3
+          </Column>
+          <Column id="actions" allowsSorting>
+            Actions
+          </Column>
+        </TableHeader>
+        <TableBody items={addresses}>
+          {(row) => (
+            <Row>
+              <Cell>{row.line_1}</Cell>
+              <Cell>{row.line_2}</Cell>
+              <Cell>{row.line_3}</Cell>
+              <Cell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="icon"
+                    onPress={() => {
+                      selectedAddress(row);
+                      setIsOpen(true);
+                    }}
+                  >
+                    <Pencil color="green" size={20}/>
+                  </Button>
+
+                  <Button variant="icon">
+                    <Trash2 color="red" size={20} />
+                  </Button>
+                </div>
+              </Cell>
+            </Row>
+          )}
+        </TableBody>
+      </Table>
+      {/* This will open the form for editing address */}
+      <DialogTrigger isOpen={isOpen}>
+        <Modal>
+          <Dialog>
+            <AddressForm defaultData={address} setIsModalOpen={setIsOpen} />
+          </Dialog>
+        </Modal>
+      </DialogTrigger>
+      <DialogTrigger isOpen={isDeleteOpen}>
+        <Modal>
+          <Dialog>
+            <Form>
+              <span>Do you want to delete this address?</span>
+              <span>{address?.line_1}</span>
+              <span>{address?.line_2}</span>
+              <span>{address?.line_3}</span>
+
+            </Form>
+          </Dialog>
+        </Modal>
+      </DialogTrigger>
+    </>
   );
 };
 
 function AddNewThing({
-  children,
-  action,
+  NewForm,
 }: {
-  children: ReactNode;
-  action: (prevState: any, formData: FormData) => Promise<FormState>;
+  NewForm: React.ComponentType<{
+    setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+    defaultData?: Address;
+  }>;
 }) {
-  const [formState, formAction, isPending] = useActionState(action, {
-    success: false,
-    errors: {},
-  });
   const [isOpen, setIsOpen] = useState(false);
-  useEffect(() => {
-    if (formState.success) {
-      setIsOpen(false);
-    }
-  }, [formState]);
+
   return (
     <>
       <DialogTrigger isOpen={isOpen}>
-        <Button onPress={() => setIsOpen(true)}>Add New</Button>
+        <Button className={"m-2"} onPress={() => setIsOpen(true)}>
+          Add New
+        </Button>
         <Modal>
           <Dialog>
-            <Form action={formAction} validationErrors={formState.errors}>
-              {children}
-              <Button className={"font-semibold"} type="submit">
-                Submit
-              </Button>
-              <Button
-                variant="destructive"
-                className={"font-semibold"}
-                onPress={() => setIsOpen(false)}
-              >
-                Cancel
-              </Button>
-            </Form>
+            <NewForm setIsModalOpen={setIsOpen} />
           </Dialog>
         </Modal>
       </DialogTrigger>
@@ -430,38 +433,110 @@ function AddNewThing({
   );
 }
 
-function AddressTable({ addresses }: { addresses: Address[] }) {
+function AddressFields({ data }: { data?: Address }) {
+  return (
+    <>
+      <TextField
+        label="Line 1"
+        name="line_1"
+        isRequired
+        minLength={3}
+        maxLength={200}
+        defaultValue={data?.line_1 || ""}
+      />
+      <TextField
+        label="Line 2"
+        name="line_2"
+        isRequired
+        minLength={3}
+        maxLength={200}
+        defaultValue={data?.line_2 || ""}
+      />
+      <TextField
+        label="Line 3"
+        name="line_3"
+        isRequired
+        minLength={3}
+        maxLength={200}
+        defaultValue={data?.line_3 || ""}
+      />
+      {data && <Input hidden readOnly name="address-id" value={data.id}/>}
+      
+    </>
+  );
+}
+function AddressForm({
+  setIsModalOpen,
+  defaultData,
+}: {
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  defaultData?: Address;
+}) {
+  const [formState, formAction, isPending] = useActionState(addAddressAction, {
+    success: false,
+    errors: {},
+  });
+  useEffect(() => {
+    if (formState.success) {
+      setIsModalOpen(false);
+      sendNotification({ message: "Address added successfully!" });
+    }
+  }, [formState]);
+  return (
+    <Form action={formAction} validationErrors={formState.errors}>
+      <span className=" text-title-md">Add New Address</span>
+      <AddressFields data={defaultData} />
+      <Button className={"font-semibold"} type="submit">
+        Submit
+      </Button>
+      <Button
+        variant="destructive"
+        className={"font-semibold"}
+        onPress={() => setIsModalOpen(false)}
+      >
+        Cancel
+      </Button>
+    </Form>
+  );
+}
+function AddressTableWrapper({ addresses }: { addresses: Address[] }) {
   return (
     <>
       <div>
         <div className=" float-right">
-          <AddNewThing action={addAddressAction}>
-            <span className=" text-title-md">Add New Address</span>
-            <TextField
-              label="Line 1"
-              name="line_1"
-              isRequired
-              minLength={3}
-              maxLength={200}
-            />
-            <TextField
-              label="Line 2"
-              name="line_2"
-              isRequired
-              minLength={3}
-              maxLength={200}
-            />
-            <TextField
-              label="Line 3"
-              name="line_3"
-              isRequired
-              minLength={3}
-              maxLength={200}
-            />
-          </AddNewThing>
+          <AddNewThing NewForm={AddressForm} />
         </div>
-        <Example addresses={addresses} />
+        <AddressTable addresses={addresses} />
       </div>
     </>
   );
+}
+
+function ButtonForm({
+  FormComponent,
+}: {
+  FormComponent: React.ComponentType<{
+    setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  }>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <DialogTrigger isOpen={isOpen}>
+        <Button className={"m-2"} onPress={() => setIsOpen(true)}>
+          Add New
+        </Button>
+        <Modal>
+          <Dialog>
+            <FormComponent setIsModalOpen={setIsOpen} />
+          </Dialog>
+        </Modal>
+      </DialogTrigger>
+    </>
+  );
+}
+
+function TestForm({ onClose }: { onClose: () => void }) {
+  return <Button onPress={onClose}>close</Button>;
 }

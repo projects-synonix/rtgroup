@@ -72,21 +72,24 @@ export async function addAddressAction(
     line_2: formData.get("line_2") as string,
     line_3: formData.get("line_3") as string,
   });
+
+  const id = formData.get("address-id") as string;
   if (!result.success) {
     return {
       success: false,
     };
   } else {
     try {
-      await db
-        .insertInto("address")
-        .values({
-          line_1: result.data.line_1,
-          line_2: result.data.line_2,
-          line_3: result.data.line_3,
-        })
-        .execute();
-        revalidatePath(menuConfig.basicdetails.route);
+      if (!id) {
+        await db.insertInto("address").values(result.data).execute();
+      } else {
+        await db
+          .updateTable("address")
+          .set(result.data)
+          .where("id", "=", parseInt(id))
+          .execute();
+      }
+      revalidatePath(menuConfig.basicdetails.route);
       return {
         success: true,
       };
@@ -94,6 +97,19 @@ export async function addAddressAction(
       return {
         success: false,
       };
+    }
+  }
+}
+
+export async function deleteAddressAction(formData:FormData) {
+  let id = formData.get('address-id') as string;
+  if(id){
+    try {
+      
+      await db.deleteFrom('address').where('id','=',parseInt(id)).execute();
+      return true;
+    } catch (error) {
+      return false
     }
   }
 }
